@@ -11,7 +11,7 @@ class InputModel(BaseModel):
 
 # Modelo para representar um arquivo gerado
 class GeneratedFile(BaseModel):
-    path: str = Field(..., description="Caminho do arquivo")
+    filename: str = Field(..., description="Nome do arquivo")
     content: str = Field(..., description="Conteúdo do arquivo")
 
 # Modelo de saída para o agente
