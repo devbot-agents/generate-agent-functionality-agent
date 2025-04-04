@@ -1,0 +1,23 @@
+{
+  "name": "generate-agent-functionality-agent",
+  "description": "Um agente especializado em gerar funcionalidades para outros agentes utilizando IA",
+  "endpoint": "https://generate-agent-functionality-agent.onrender.com/api/v1/execute",
+  "method": "POST",
+  "input_schema": {
+    "agent_name": "string",
+    "agent_description": "string",
+    "input_schema": "object",
+    "output_schema": "object",
+    "agent_prompt": "string"
+  },
+  "output_schema": {
+    "files": [
+      {
+        "path": "string",
+        "content": "string"
+      }
+    ],
+    "status": "string",
+    "message": "string"
+  }
+} 
