@@ -52,7 +52,7 @@ def generate_with_openai(system_message: str, prompt: str, max_tokens: int = 200
     try:
         logger.info(f"Gerando conteúdo com prompt de {len(prompt)} caracteres")
         response = client.chat.completions.create(
-            model="gpt-4", 
+            model="gpt-4-0125-preview", 
             messages=[
                 {"role": "system", "content": system_message},
                 {"role": "user", "content": prompt}
