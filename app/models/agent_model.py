@@ -16,6 +16,4 @@ class GeneratedFile(BaseModel):
 
 # Modelo de saída para o agente
 class OutputModel(BaseModel):
-    files: List[GeneratedFile] = Field(..., description="Lista de arquivos gerados")
-    status: str = Field(..., description="Status da operação (success/error)")
-    message: str = Field(..., description="Mensagem informativa sobre a operação") 
+    files: List[GeneratedFile] = Field(..., description="Lista de arquivos gerados") 
