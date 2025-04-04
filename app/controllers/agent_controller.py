@@ -3,14 +3,14 @@ from app.models.agent_model import InputModel, OutputModel, GeneratedFile
 from typing import Dict, Any, List
 import os
 import json
-import openai
+from openai import OpenAI
 from dotenv import load_dotenv
 
 # Carregar variáveis de ambiente
 load_dotenv()
 
-# Configurar a API do OpenAI
-openai.api_key = os.getenv("OPENAI_API_KEY")
+# Configurar o cliente OpenAI
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 router = APIRouter(prefix="/api/v1", tags=["agent"])
 
@@ -45,7 +45,7 @@ def generate_controller(agent_name: str, agent_description: str, input_schema: D
         prompt += f"\n\nInstruções adicionais: {agent_prompt}"
     
     try:
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model="gpt-4", 
             messages=[
                 {"role": "system", "content": system_message},
@@ -85,7 +85,7 @@ def generate_tests(agent_name: str, agent_description: str, input_schema: Dict, 
     """
     
     try:
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model="gpt-4", 
             messages=[
                 {"role": "system", "content": system_message},
@@ -125,7 +125,7 @@ def generate_readme(agent_name: str, agent_description: str, input_schema: Dict,
     """
     
     try:
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model="gpt-4", 
             messages=[
                 {"role": "system", "content": system_message},
@@ -168,7 +168,7 @@ def generate_prompt_file(agent_name: str, agent_description: str, input_schema: 
         prompt += f"\n\nInstruções adicionais: {agent_prompt}"
     
     try:
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model="gpt-4", 
             messages=[
                 {"role": "system", "content": system_message},
@@ -199,52 +199,55 @@ async def execute(input_data: InputModel):
             input_data.agent_prompt
         )
         generated_files.append(GeneratedFile(
-            path="app/controllers/agent_controller.py",
+            filename="app/controllers/agent_controller.py",
             content=controller_content
         ))
         
         # Gerar testes
         tests_content = generate_tests(
-            input_data.agent_name, 
-            input_data.agent_description, 
-            input_data.input_schema, 
+            input_data.agent_name,
+            input_data.agent_description,
+            input_data.input_schema,
             input_data.output_schema
         )
         generated_files.append(GeneratedFile(
-            path="tests/test_main.py",
+            filename="tests/test_main.py",
             content=tests_content
         ))
         
         # Gerar README
         readme_content = generate_readme(
-            input_data.agent_name, 
-            input_data.agent_description, 
-            input_data.input_schema, 
+            input_data.agent_name,
+            input_data.agent_description,
+            input_data.input_schema,
             input_data.output_schema
         )
         generated_files.append(GeneratedFile(
-            path="README.md",
+            filename="README.md",
             content=readme_content
         ))
         
         # Gerar arquivo de prompt
         prompt_content = generate_prompt_file(
-            input_data.agent_name, 
-            input_data.agent_description, 
-            input_data.input_schema, 
+            input_data.agent_name,
+            input_data.agent_description,
+            input_data.input_schema,
             input_data.output_schema,
             input_data.agent_prompt
         )
         generated_files.append(GeneratedFile(
-            path="agent_prompt.txt",
+            filename="agent_prompt.txt",
             content=prompt_content
         ))
         
-        return {
-            "files": generated_files,
-            "status": "success",
-            "message": f"Geração de funcionalidades para o agente {input_data.agent_name} concluída com sucesso."
-        }
+        return OutputModel(files=generated_files)
         
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e)) 
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/health")
+async def health_check():
+    """
+    Endpoint para verificar a saúde do serviço.
+    """
+    return {"status": "healthy"} 
