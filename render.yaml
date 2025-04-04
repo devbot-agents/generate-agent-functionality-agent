@@ -2,9 +2,13 @@ services:
   - type: web
     name: generate-agent-functionality-agent
     env: python
-    buildCommand: pip install -r requirements.txt
+    buildCommand: |
+      pip install --upgrade pip
+      pip install -r requirements.txt
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
     plan: free
     envVars:
       - key: OPENAI_API_KEY
-        sync: false 
+        sync: false
+      - key: PYTHON_VERSION
+        value: 3.11.4 
